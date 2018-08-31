@@ -9,7 +9,7 @@ class App extends Component {
   }
 
   //To run inside the Workspace, please include the credentials.
-  
+  /*
   componentDidMount() {
     const api = process.env.REACT_APP_BACKEND || 'http://localhost:3001';
     const url = `${api}/categories`;
@@ -25,10 +25,10 @@ class App extends Component {
         this.setState({ backend: data });
       });
   }
-
+  */
   // To run outside of the Workspace, please do not include the credentials.
 
-  /* 
+   
   componentDidMount() {
     const api = process.env.REACT_APP_BACKEND ||  'http://localhost:3001';
     const url = `${api}/categories`;
@@ -39,13 +39,12 @@ class App extends Component {
         this.setState({backend:data});
       });
   }
-  */
+  
 
   render() {
     return (
       <div className="App">
         <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
           <h2>Welcome to React</h2>
         </div>
         <p className="App-intro">
