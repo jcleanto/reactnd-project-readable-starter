@@ -57,7 +57,7 @@ export const remove = (post) =>
         }
     }).then(res => res.json())
 
-export const vote = (option) =>
+export const vote = (post) =>
     fetch(`${api}/posts/${post.id}`, {
         method: 'POST',
         headers: {
@@ -65,7 +65,7 @@ export const vote = (option) =>
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
-            option: option
+            option: post.option
         })
     }).then(res => res.json())
 
