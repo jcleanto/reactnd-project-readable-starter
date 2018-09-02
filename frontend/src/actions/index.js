@@ -1,25 +1,43 @@
-export const CREATE_POST = 'CREATE_POST'
-export const DELETE_POST = 'DELETE_POST'
-export const CREATE_COMMENT = 'CREATE_COMMENT'
-export const DELETE_COMMENT = 'DELETE_COMMENT'
+import { SAVE_POST, DELETE_POST, REQUEST_POSTS, REFRESH_POSTS, SAVE_COMMENT, DELETE_COMMENT} from '../constants/ActionTypes'
+import uuid from 'uuid'
+import * as PostsAPI from '../utils/PostsAPI'
 
-export function createPost ({ post }) {
+function requestPosts () {
     return {
-        type: CREATE_POST,
+        type: REQUEST_POSTS
+    }
+}
+
+export function listPosts () {
+    return dispatch => {
+        dispatch(requestPosts());
+        PostsAPI.getAll().then((items) => {
+            items.map((items) => {
+                dispatch({ type: REFRESH_POSTS, items})
+            });
+        });
+    }
+}
+
+export function savePost (post) {
+    //let errors = [];
+    //let postInstance = { ...post }
+    return {
+        type: SAVE_POST,
         post
     }
 }
 
-export function deletePost ({ post }) {
+export function deletePost (post) {
     return {
         type: DELETE_POST,
-        post
+        post: { ...post }
     }
 }
 
-export function createComment ({ comment }) {
+export function saveComment ({ comment }) {
     return {
-        type: CREATE_COMMENT,
+        type: SAVE_COMMENT,
         comment
     }
 }

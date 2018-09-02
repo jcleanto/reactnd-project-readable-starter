@@ -1,62 +1,93 @@
 import React, { Component } from "react";
+import { connect } from 'react-redux'
+import { Route, Switch } from 'react-router-dom'
+import ListPosts from './ListPosts'
+import DetailPost from './DetailPost'
+import { listPosts } from '../actions'
+import {
+  Collapse,
+  Navbar,
+  NavbarToggler,
+  NavbarBrand,
+  Nav,
+  NavItem,
+  NavLink,
+  Container,
+  Jumbotron
+} from 'reactstrap';
+import _ from 'lodash'
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      backend: "backend-data"
-    };
+
+  state = {
+    isOpen: false
   }
 
-  //To run inside the Workspace, please include the credentials.
-  /*
-  componentDidMount() {
-    const api = process.env.REACT_APP_BACKEND || 'http://localhost:3001';
-    const url = `${api}/categories`;
-    console.log("fetching from url", url);
-    fetch(url, {
-      headers: { Authorization: "whatever-you-want" },
-      credentials: "include"
-    })
-      .then(res => {
-        return res.text();
-      })
-      .then(data => {
-        this.setState({ backend: data });
-      });
+  async componentDidMount() {
+    const { listPosts } = this.props
+    await listPosts();
+    /*this.setState({
+      posts: _.sortBy(posts, 'voteScore').reverse()
+    });*/
   }
-  */
-  // To run outside of the Workspace, please do not include the credentials.
 
-   
-  componentDidMount() {
-    const api = process.env.REACT_APP_BACKEND ||  'http://localhost:3001';
-    const url = `${api}/categories`;
-    console.log('fetching from url', url);
-    fetch(url, { headers: { 'Authorization': 'whatever-you-want' }} )
-      .then( (res) => { return(res.text()) })
-      .then((data) => {
-        this.setState({backend:data});
-      });
+  toggle = () => {
+    this.setState({
+      isOpen: !this.state.isOpen
+    });
   }
-  
+
+  sortBy = (field) => {
+    const orderedPosts = _.sortBy(this.state.posts, field)
+    if (field === 'voteScore') orderedPosts.reverse()
+    /*this.setState({
+      posts: orderedPosts
+    });*/
+  }
 
   render() {
+    //const { posts } = this.state
+    //console.log(posts)
     return (
       <div className="App">
-        <div className="App-header">
-          <h2>Welcome to React</h2>
-        </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-        <p>
-          Talking to the backend yields these categories: <br />
-          {this.state.backend}
-        </p>
+        <Navbar color="light" light expand="md">
+          <NavbarBrand href="/">Readable</NavbarBrand>
+          <NavbarToggler onClick={this.toggle} />
+          <Collapse isOpen={this.state.isOpen} navbar>
+            <Nav className="ml-auto" navbar>
+              <NavItem>
+                <NavLink href="/">Home</NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink href="/posts">New Post</NavLink>
+              </NavItem>
+            </Nav>
+          </Collapse>
+        </Navbar>
+        <Jumbotron>
+          <Container>
+            <Switch>
+              <Route exact path="/" component={ListPosts} />
+              <Route exact path="/:category" component={ListPosts} />
+              <Route path="/:category/:post_id" component={DetailPost} />
+            </Switch>
+          </Container>
+        </Jumbotron>
       </div>
     );
   }
 }
 
-export default App;
+function mapStateToProps(state) {
+  return {
+    categories: state.categories
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    listPosts: () => dispatch(listPosts())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)

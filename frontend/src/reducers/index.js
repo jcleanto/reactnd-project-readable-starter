@@ -1,45 +1,65 @@
 import { combineReducers } from 'redux'
-import { CREATE_POST, DELETE_POST, CREATE_COMMENT, DELETE_COMMENT } from '../actions'
+import { SAVE_POST, DELETE_POST, REQUEST_POSTS, REFRESH_POSTS, SAVE_COMMENT, DELETE_COMMENT, REFRESH_COMMENTS } from '../constants/ActionTypes'
 
-function post (state = {}, action) {
-    const { post } = action;
+const initialState = {
+    item: {},
+    items: [],
+    isFetching: false,
+    comment: {}
+}
+
+function posts (state = initialState, action) {
+    const { item, items } = action;
 
     switch (action.type) {
-        case CREATE_POST :
+        case REQUEST_POSTS :
             return {
                 ...state,
-                [post.id]: post
+                isFetching: true
+            };
+        case REFRESH_POSTS :
+            return {
+                ...state,
+                isFetching: false,
+                items: items
+            };
+        case SAVE_POST :
+            return {
+                ...state,
+                [item.id]: item
             };
         case DELETE_POST :
             return {
                 ...state,
-                [post.id]: null
-            }
+                [item.id]: null
+            };
+        break;
         default :
             return state;
     }
 }
 
-function comment (state = {}, action) {
-    const { comment } = action;
+function comments (state = {}, action) {
+    const { item } = action;
 
     switch (action.type) {
-        case CREATE_COMMENT :
+        case SAVE_COMMENT :
             return {
                 ...state,
-                [comment.id]: comment
+                [item.id]: item
             };
         case DELETE_COMMENT :
             return {
                 ...state,
-                [comment.id]: null
+                [item.id]: null
             };
+        break;
         default :
             return state; 
     }
 }
 
 export default combineReducers({
-    post,
-    comment
+    posts,
+    comments
 })
