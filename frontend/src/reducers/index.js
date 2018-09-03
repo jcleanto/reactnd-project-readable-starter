@@ -17,7 +17,7 @@ function posts (state = initialState, action) {
         case REFRESH_CATEGORIES :
             return {
                 ...state,
-                categories: categories
+                categories: categories.categories
             };
         case REQUEST_POSTS :
             return {

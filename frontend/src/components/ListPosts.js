@@ -7,7 +7,7 @@ import { formatDate, formatHour } from '../utils/helpers'
 class ListPosts extends Component {
     render() {
         const { categories, items, isFetching } = this.props
-        //console.log(categories)
+        console.log(categories)
         return (
             <Row>
                 <Col xs="8">
@@ -30,12 +30,12 @@ class ListPosts extends Component {
                         <CardHeader>Categories</CardHeader>
                         <CardBody>
                             <ul>
-                                {/*!isFetching && categories !== null &&
+                                {!isFetching && categories !== null &&
                                     categories.map(category => (
                                         <li key={category.name}>
                                             <a href="#">{category.name}</a>
                                         </li>
-                                    ))*/
+                                    ))
                                 }
                             </ul>
                         </CardBody>
