@@ -18,6 +18,10 @@ export const getAll = () =>
     fetch(`${api}/posts`, { headers })
         .then(res => res.json())
 
+export const getAllCategories = () =>
+    fetch(`${api}/categories`, { headers })
+        .then(res => res.json())
+
 export const insert = (post) =>
     fetch(`${api}/posts`, {
         method: 'POST',

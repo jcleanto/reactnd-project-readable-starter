@@ -1,7 +1,9 @@
 import { combineReducers } from 'redux'
-import { SAVE_POST, DELETE_POST, REQUEST_POSTS, REFRESH_POSTS, SAVE_COMMENT, DELETE_COMMENT, REFRESH_COMMENTS } from '../constants/ActionTypes'
+import { REFRESH_CATEGORIES, SAVE_POST, DELETE_POST, REQUEST_POSTS, REFRESH_POSTS, SAVE_COMMENT, DELETE_COMMENT, REFRESH_COMMENTS } from '../constants/ActionTypes'
+import _ from 'lodash'
 
 const initialState = {
+    categories: [],
     item: {},
     items: [],
     isFetching: false,
@@ -9,19 +11,26 @@ const initialState = {
 }
 
 function posts (state = initialState, action) {
-    const { item, items } = action;
+    const { categories, item, items } = action;
 
     switch (action.type) {
+        case REFRESH_CATEGORIES :
+            return {
+                ...state,
+                categories: categories
+            };
         case REQUEST_POSTS :
             return {
                 ...state,
                 isFetching: true
             };
         case REFRESH_POSTS :
+            //recents posts first
+            const orderedItems = _.sortBy(items, 'timestamp').reverse();
             return {
                 ...state,
                 isFetching: false,
-                items: items
+                items: orderedItems
             };
         case SAVE_POST :
             return {

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
 import ListPosts from './ListPosts'
 import DetailPost from './DetailPost'
-import { listPosts } from '../actions'
+import { listPosts, listCategories } from '../actions'
 import {
   Collapse,
   Navbar,
@@ -24,11 +24,8 @@ class App extends Component {
   }
 
   async componentDidMount() {
-    const { listPosts } = this.props
-    await listPosts();
-    /*this.setState({
-      posts: _.sortBy(posts, 'voteScore').reverse()
-    });*/
+    const { listPosts, listCategories } = this.props
+    await Promise.all([listPosts(), listCategories()]);
   }
 
   toggle = () => {
@@ -80,13 +77,14 @@ class App extends Component {
 
 function mapStateToProps(state) {
   return {
-    categories: state.categories
+    //categories: state.categories
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    listPosts: () => dispatch(listPosts())
+    listPosts: () => dispatch(listPosts()),
+    listCategories: () => dispatch(listCategories())
   }
 }
 

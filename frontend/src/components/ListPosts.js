@@ -1,29 +1,45 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Row, Col } from 'reactstrap';
+import { Row, Col, Card, CardBody, CardHeader, CardText } from 'reactstrap';
+import { formatDate, formatHour } from '../utils/helpers'
 
 class ListPosts extends Component {
     render() {
-        const { items, isFetching } = this.props
-        //console.log(items)
+        const { categories, items, isFetching } = this.props
+        //console.log(categories)
         return (
             <Row>
                 <Col xs="8">
                     <ul>
                         {!isFetching && items !== null &&
-                            <li key={items.id}>
-                                <h1 className="mt-4">{items.title}</h1>
-                                <p className="lead">by {items.author}</p>
-                                <hr />
-                                <p>Posted on {items.timestamp}</p>
-                                <hr />
-                            </li>
+                            items.map(item => (
+                                <li key={item.id}>
+                                    <h1 className="mt-4">{item.title}</h1>
+                                    <p className="lead">by {item.author}</p>
+                                    <hr />
+                                    <p>Posted on {formatDate(item.timestamp)} at {formatHour(item.timestamp)}</p>
+                                    <hr />
+                                </li>
+                            ))
                         }
                     </ul>
                 </Col>
                 <Col xs="4">
-                    teste
+                    <Card>
+                        <CardHeader>Categories</CardHeader>
+                        <CardBody>
+                            <ul>
+                                {/*!isFetching && categories !== null &&
+                                    categories.map(category => (
+                                        <li key={category.name}>
+                                            <a href="#">{category.name}</a>
+                                        </li>
+                                    ))*/
+                                }
+                            </ul>
+                        </CardBody>
+                    </Card>
                 </Col>
             </Row>
         )
@@ -31,8 +47,9 @@ class ListPosts extends Component {
 }
 
 function mapStateToProps(state) {
-    const activePosts = state.posts.items//.map(post => ({...post, post}));
+    const activePosts = state.posts.items.filter(post => !post.deleted);
     return {
+        categories: state.posts.categories,
         items: activePosts,
         isFetching: state.isFetching
     }
