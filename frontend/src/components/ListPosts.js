@@ -1,66 +1,56 @@
-import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
-import { connect } from 'react-redux'
-import { Row, Col, Card, CardBody, CardHeader, CardText } from 'reactstrap';
+import React from 'react'
+import { Row, Col, Badge, Button, ButtonGroup } from 'reactstrap';
 import { formatDate, formatHour } from '../utils/helpers'
 
-class ListPosts extends Component {
-    render() {
-        const { categories, items, isFetching } = this.props
-        console.log(categories)
-        return (
-            <Row>
-                <Col xs="8">
-                    <ul>
-                        {!isFetching && items !== null &&
-                            items.map(item => (
-                                <li key={item.id}>
-                                    <h1 className="mt-4">{item.title}</h1>
-                                    <p className="lead">by {item.author}</p>
-                                    <hr />
-                                    <p>Posted on {formatDate(item.timestamp)} at {formatHour(item.timestamp)}</p>
-                                    <hr />
-                                </li>
-                            ))
-                        }
-                    </ul>
-                </Col>
-                <Col xs="4">
-                    <Card>
-                        <CardHeader>Categories</CardHeader>
-                        <CardBody>
-                            <ul>
-                                {!isFetching && categories !== null &&
-                                    categories.map(category => (
-                                        <li key={category.name}>
-                                            <a href="#">{category.name}</a>
-                                        </li>
-                                    ))
-                                }
-                            </ul>
-                        </CardBody>
-                    </Card>
-                </Col>
-            </Row>
-        )
-    }
+export const ListPosts = ({ posts, isFetching, history, handleClickPost, handleClickVotePost, handleClickEditPost }) => {
+    return (
+        <ul>
+            {!isFetching && posts !== null &&
+                posts.map(post => (
+                    <li key={post.id} className="list-post">
+                        <h1 className="mt-4">
+                            <a href="#" onClick={(event) => handleClickPost(event, post, history)}>{post.title}</a>
+                        </h1>
+                        <p className="lead">by {post.author}</p>
+                        <hr />
+                        <Row>
+                            <Col xs="7">
+                                <Row>
+                                    <Col xs="12">
+                                        <small>Posted on {formatDate(post.timestamp)} at {formatHour(post.timestamp)}</small>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs="5">
+                                        <small>Comments:</small> <Badge color="primary">{post.commentCount}</Badge>
+                                    </Col>
+                                    <Col xs="5">
+                                        <small>Vote Score:</small> <Badge color="primary">{post.voteScore}</Badge>
+                                    </Col>
+                                </Row>
+                            </Col>
+                            <Col xs="3">
+                                <ButtonGroup>
+                                    <Button size="sm" onClick={(event) => handleClickEditPost(event, post, history)}>
+                                        Edit
+                                    </Button>
+                                    <Button size="sm" onClick={(event) => handleClickVotePost(event, post, 'upVote')}>
+                                        Delete
+                                    </Button>
+                                    <Button size="sm" onClick={(event) => handleClickVotePost(event, post, 'upVote')}>
+                                        Upvote
+                                    </Button>
+                                    <Button size="sm" onClick={(event) => handleClickVotePost(event, post, 'downVote')}>
+                                        Downvote
+                                    </Button>
+                                </ButtonGroup>
+                            </Col>
+                        </Row>
+                        <hr />
+                    </li>
+                ))
+            }
+        </ul>
+    )
 }
 
-function mapStateToProps(state) {
-    const activePosts = state.posts.items.filter(post => !post.deleted);
-    return {
-        categories: state.posts.categories,
-        items: activePosts,
-        isFetching: state.isFetching
-    }
-}
-
-/*
-function mapDispatchToProps(dispatch) {
-    return {
-
-    }
-}
-*/
-
-export default connect(mapStateToProps)(ListPosts)

@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import { connect } from 'react-redux'
-import { Route, Switch } from 'react-router-dom'
-import ListPosts from './ListPosts'
-import DetailPost from './DetailPost'
-import { listPosts, listCategories } from '../actions'
+import { Route, Switch, withRouter } from 'react-router-dom'
+import RootView from '../views/RootView'
+import DetailPostView from '../views/DetailPostView'
+import EditPostView from '../views/EditPostView'
+import { ErrorView } from '../views/ErrorView'
 import {
   Collapse,
   Navbar,
@@ -15,17 +15,12 @@ import {
   Container,
   Jumbotron
 } from 'reactstrap';
-import _ from 'lodash'
+import '../styles/App.css'
 
 class App extends Component {
 
   state = {
     isOpen: false
-  }
-
-  async componentDidMount() {
-    const { listPosts, listCategories } = this.props
-    await Promise.all([listPosts(), listCategories()]);
   }
 
   toggle = () => {
@@ -34,39 +29,31 @@ class App extends Component {
     });
   }
 
-  sortBy = (field) => {
-    const orderedPosts = _.sortBy(this.state.posts, field)
-    if (field === 'voteScore') orderedPosts.reverse()
-    /*this.setState({
-      posts: orderedPosts
-    });*/
-  }
-
   render() {
-    //const { posts } = this.state
-    //console.log(posts)
+
     return (
       <div className="App">
-        <Navbar color="light" light expand="md">
-          <NavbarBrand href="/">Readable</NavbarBrand>
-          <NavbarToggler onClick={this.toggle} />
-          <Collapse isOpen={this.state.isOpen} navbar>
-            <Nav className="ml-auto" navbar>
-              <NavItem>
-                <NavLink href="/">Home</NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink href="/posts">New Post</NavLink>
-              </NavItem>
-            </Nav>
-          </Collapse>
+        <Navbar color="light" light expand="lg">
+          <Container>
+            <NavbarBrand href="/">Readable</NavbarBrand>
+            <NavbarToggler onClick={this.toggle} />
+            <Collapse isOpen={this.state.isOpen} navbar>
+              <Nav className="ml-auto" navbar>
+                <NavItem>
+                  <NavLink href="/">Home</NavLink>
+                </NavItem>
+              </Nav>
+            </Collapse>
+          </Container>
         </Navbar>
         <Jumbotron>
           <Container>
             <Switch>
-              <Route exact path="/" component={ListPosts} />
-              <Route exact path="/:category" component={ListPosts} />
-              <Route path="/:category/:post_id" component={DetailPost} />
+              <Route exact path="/" component={RootView} />
+              <Route exact path="/error/page" render={() => <ErrorView />} />
+              <Route exact path="/:category" component={RootView} />
+              <Route exact path="/:category/:postId" component={DetailPostView} />
+              <Route exact path="/posts/edit/:postId" component={EditPostView} />
             </Switch>
           </Container>
         </Jumbotron>
@@ -75,17 +62,4 @@ class App extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    //categories: state.categories
-  }
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    listPosts: () => dispatch(listPosts()),
-    listCategories: () => dispatch(listCategories())
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default withRouter(App)

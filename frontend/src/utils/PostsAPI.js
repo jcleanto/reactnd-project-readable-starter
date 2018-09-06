@@ -1,3 +1,5 @@
+import uuid from 'uuid'
+
 const api = process.env.REACT_APP_BACKEND || 'http://localhost:3001';
 
 // Generate a unique token for storing data on the backend server.
@@ -13,6 +15,7 @@ const headers = {
 export const get = (postId) =>
     fetch(`${api}/posts/${postId}`, { headers })
         .then(res => res.json())
+        .catch((error) => ({ networkError: error }))
 
 export const getAll = () =>
     fetch(`${api}/posts`, { headers })
@@ -22,6 +25,10 @@ export const getAllCategories = () =>
     fetch(`${api}/categories`, { headers })
         .then(res => res.json())
 
+export const getAllPostsByCategory = (category) =>
+    fetch(`${api}/${category}/posts`, { headers })
+        .then(res => res.json())
+
 export const insert = (post) =>
     fetch(`${api}/posts`, {
         method: 'POST',
@@ -29,13 +36,11 @@ export const insert = (post) =>
             ...headers,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ 
-            id: post.id,
+        body: JSON.stringify({
+            ...post,
+            id: uuid.v1(),
             timestamp: Date.now(),
-            title: post.title,
-            body: post.body,
-            author: post.author,
-            category: post.category
+            voteScore: 0
         })
     }).then(res => res.json())
 
@@ -47,8 +52,9 @@ export const update = (post) =>
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            title: post.title,
-            body: post.body
+            ...post,
+            timestamp: Date.now(),
+            voteScore: 0
         })
     }).then(res => res.json())
 
@@ -61,15 +67,15 @@ export const remove = (post) =>
         }
     }).then(res => res.json())
 
-export const vote = (post) =>
+export const vote = (post, option) =>
     fetch(`${api}/posts/${post.id}`, {
         method: 'POST',
         headers: {
             ...headers,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ 
-            option: post.option
+        body: JSON.stringify({
+            option: option
         })
     }).then(res => res.json())
 

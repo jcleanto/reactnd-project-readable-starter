@@ -1,3 +1,5 @@
+import uuid from 'uuid'
+
 const api = process.env.REACT_APP_BACKEND || 'http://localhost:3001';
 
 // Generate a unique token for storing data on the backend server.
@@ -10,7 +12,7 @@ const headers = {
     'Authorization': token
 }
 
-export const get = (commentId) =>
+export const get = (commentId) => 
     fetch(`${api}/comments/${commentId}`, { headers })
         .then(res => res.json())
 
@@ -26,11 +28,12 @@ export const insert = (comment) =>
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            id: comment.id,
+            id: uuid.v1(),
             timestamp: Date.now(),
             body: comment.body,
             author: comment.author,
-            parentId: comment.parentId
+            parentId: comment.parentId,
+            voteScore: 0
         })
     }).then(res => res.json())
 
@@ -42,8 +45,8 @@ export const update = (comment) =>
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            timestamp: Date.now(),
-            body: comment.body
+            ...comment,
+            timestamp: Date.now()
         })
     }).then(res => res.json())
 

@@ -1,74 +1,147 @@
 import { combineReducers } from 'redux'
-import { REFRESH_CATEGORIES, SAVE_POST, DELETE_POST, REQUEST_POSTS, REFRESH_POSTS, SAVE_COMMENT, DELETE_COMMENT, REFRESH_COMMENTS } from '../constants/ActionTypes'
+import {
+    REFRESH_CATEGORIES,
+    SAVE_POST,
+    DELETE_POST,
+    GET_POST,
+    DETAIL_POST,
+    VOTE_POST,
+    EDIT_POST,
+    REQUEST_POSTS,
+    REFRESH_POSTS,
+    SAVE_COMMENT,
+    DELETE_COMMENT,
+    GET_COMMENT,
+    CLEAR_COMMENT,
+    REFRESH_COMMENTS,
+    LIST_COMMENTS,
+    SORT_POSTS,
+    ERROR_PAGE
+} from '../constants/ActionTypes'
 import _ from 'lodash'
 
 const initialState = {
     categories: [],
-    item: {},
-    items: [],
+    post: {},
+    posts: [],
     isFetching: false,
-    comment: {}
+    comment: {},
+    category: '',
+    comments: [],
+    sortBy: 'voteScore'
 }
 
-function posts (state = initialState, action) {
-    const { categories, item, items } = action;
+function postsReducer(state = initialState, action) {
+    const { categories, post, posts, comments, comment, sortBy } = action;
 
     switch (action.type) {
-        case REFRESH_CATEGORIES :
+        case REFRESH_CATEGORIES:
             return {
                 ...state,
                 categories: categories.categories
             };
-        case REQUEST_POSTS :
+        case REQUEST_POSTS:
             return {
                 ...state,
                 isFetching: true
             };
-        case REFRESH_POSTS :
-            //recents posts first
-            const orderedItems = _.sortBy(items, 'timestamp').reverse();
+        case REFRESH_POSTS:
             return {
                 ...state,
                 isFetching: false,
-                items: orderedItems
+                posts: posts,
+                sortBy: sortBy
             };
-        case SAVE_POST :
+        case SORT_POSTS:
             return {
                 ...state,
-                [item.id]: item
+                posts: posts,
+                sortBy: sortBy
             };
-        case DELETE_POST :
+        case SAVE_POST:
             return {
                 ...state,
-                [item.id]: null
+                post
             };
-        break;
-        default :
+        case DELETE_POST:
+            return {
+                ...state,
+                [post.id]: null
+            };
+        case GET_POST:
+            return {
+                ...state,
+                post
+            };
+        case DETAIL_POST:
+            return {
+                ...state,
+                post: { ...post }
+            };
+        case EDIT_POST:
+            return {
+                ...state,
+                post
+            };
+        case LIST_COMMENTS:
+            //more voted first
+            const orderedComments = _.sortBy(comments, 'voteScore').reverse();
+            return {
+                ...state,
+                comments: orderedComments
+            };
+        case REFRESH_COMMENTS:
+            let refreshedComments = state.comments.filter(c => c.id !== comment.id);
+            refreshedComments = _.sortBy(refreshedComments, 'voteScore').reverse();
+            return {
+                ...state,
+                comments: [...refreshedComments, comment]
+            };
+        case VOTE_POST:
+            return {
+                ...state,
+                [post.voteScore]: post.voteScore
+            };
+        case ERROR_PAGE:
+            return {
+                ...state,
+                post
+            };
+        default:
             return state;
     }
 }
 
-function comments (state = {}, action) {
-    const { item } = action;
+function commentsReducer(state = {}, action) {
+    const { comment } = action;
 
     switch (action.type) {
-        case SAVE_COMMENT :
+        case SAVE_COMMENT:
             return {
                 ...state,
-                [item.id]: item
+                [comment.id]: comment.id
             };
-        case DELETE_COMMENT :
+        case DELETE_COMMENT:
             return {
                 ...state,
-                [item.id]: null
+                [comment.id]: null
             };
-        break;
-        default :
-            return state; 
+        case GET_COMMENT:
+            return {
+                ...state,
+                comment
+            };
+        case CLEAR_COMMENT:
+            return {
+                ...state,
+                comment: {}
+            };
+        default:
+            return state;
     }
 }
 
 export default combineReducers({
-    posts,
-    comments
+    postsReducer,
+    commentsReducer
 })
