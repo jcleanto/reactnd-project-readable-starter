@@ -14,7 +14,8 @@ import {
     CardHeader,
     Badge
 } from 'reactstrap'
-import { getComment, saveComment, voteComment } from '../actions'
+import { getComment, saveComment, voteComment, deleteComment } from '../actions'
+import { FormErrors } from './FormErrors'
 
 class FormComment extends Component {
 
@@ -33,7 +34,38 @@ class FormComment extends Component {
             ...FormComment.commentInstance,
             'parentId': this.props.post.id,
             ...this.props.comment
+        },
+        formErrors: { author: '', body: '' },
+        authorValid: false,
+        bodyValid: false
+    }
+
+    validateField(fieldName, value) {
+        let fieldValidationErrors = this.state.formErrors;
+        let authorValid = this.state.authorValid;
+        let bodyValid = this.state.bodyValid;
+
+        switch (fieldName) {
+            case 'author':
+                authorValid = value.length >= 3;
+                fieldValidationErrors.author = authorValid ? '' : ' is too short';
+                break;
+            case 'body':
+                bodyValid = value.length >= 3;
+                fieldValidationErrors.body = bodyValid ? '' : ' is too short';
+                break;
+            default:
+                break;
         }
+        this.setState({
+            formErrors: fieldValidationErrors,
+            authorValid: authorValid,
+            bodyValid: bodyValid
+        }, this.validateForm);
+    }
+
+    validateForm() {
+        this.setState({ formValid: this.state.authorValid && this.state.bodyValid });
     }
 
     handleSubmit = (e) => {
@@ -42,11 +74,6 @@ class FormComment extends Component {
             ...this.state.commentToSave,
             'parentId': this.props.post.id
         });
-        //console.log({ 
-        //    ...this.state.commentToSave
-        //})
-        //if (this.props.onCreateContact)
-        //    this.props.onCreateContact(values)
     }
 
     handleClearForm = (e) => {
@@ -56,25 +83,32 @@ class FormComment extends Component {
         });
     }
 
-    handleEditComment = (comment) => {
+    handleClickEditComment = (comment) => {
         this.props.onEditComment(comment);
         this.setState({
             commentToSave: comment
         });
     }
 
+    handleClickDeleteComment = (comment) => {
+        this.props.onClickDeleteComment(comment);
+    }
+
     handleClickVoteComment = (comment, post, option) => {
         this.props.onClickVoteComment(comment, post, option);
     }
 
-    onInputChange = (input) => {
+    onInputChange = (e, input) => {
+        const name = e.target.name;
+        const value = e.target.value;
         this.setState({
+            ...this.state,
             commentToSave: { ...this.state.commentToSave, ...input }
-        });
+        }, () => { this.validateField(name, value) });
     }
 
     render() {
-        const { post, comments, history } = this.props
+        const { post, comments } = this.props
         const { commentToSave } = this.state
 
         return (
@@ -86,23 +120,26 @@ class FormComment extends Component {
                             <FormGroup>
                                 <Input
                                     type="text"
+                                    name="author"
                                     value={commentToSave && commentToSave.author}
                                     placeholder="Author"
-                                    onChange={(e) => this.onInputChange({ author: e.target.value })} />
+                                    onChange={(e) => this.onInputChange(e, { author: e.target.value })} />
                             </FormGroup>
                             <FormGroup>
                                 <Input
                                     type="textarea"
+                                    name="body"
                                     value={commentToSave && commentToSave.body}
                                     placeholder="Text"
-                                    onChange={(e) => this.onInputChange({ body: e.target.value })} />
+                                    onChange={(e) => this.onInputChange(e, { body: e.target.value })} />
                             </FormGroup>
                             <FormGroup>
-                                <Button color="primary">Submit</Button>
+                                <Button color="primary" disabled={!this.state.formValid}>Submit</Button>
                                 {'  '}
                                 <Button color="primary" onClick={(e) => this.handleClearForm(e)}>Cancel</Button>
                             </FormGroup>
                         </Form>
+                        <FormErrors formErrors={this.state.formErrors} />
                     </CardBody>
                 </Card>
                 <br />
@@ -118,8 +155,11 @@ class FormComment extends Component {
                             </Col>
                             <Col xs="3">
                                 <ButtonGroup>
-                                    <Button size="sm" onClick={() => this.handleEditComment(comment)}>
+                                    <Button size="sm" onClick={() => this.handleClickEditComment(comment)}>
                                         Edit
+                                    </Button>
+                                    <Button size="sm" onClick={() => this.handleClickDeleteComment(comment)}>
+                                        Delete
                                     </Button>
                                     <Button size="sm" onClick={() => this.handleClickVoteComment(comment, post, 'upVote')}>
                                         Upvote
@@ -141,7 +181,7 @@ function mapStateToProps(state) {
     return {
         post: state.postsReducer.post,
         isFetching: state.isFetching,
-        comments: state.postsReducer.comments,
+        comments: state.commentsReducer.comments,
         comment: state.commentsReducer.comment
     }
 }
@@ -151,6 +191,7 @@ function mapDispatchToProps(dispatch) {
         onEditComment: (comment) => dispatch(getComment(comment)),
         onSaveComment: (comment) => dispatch(saveComment(comment)),
         onClickVoteComment: (comment, post, option) => dispatch(voteComment(comment, post, option)),
+        onClickDeleteComment: (comment) => dispatch(deleteComment(comment))
     }
 }
 

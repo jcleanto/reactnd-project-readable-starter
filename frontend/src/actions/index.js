@@ -8,7 +8,6 @@ import {
     REQUEST_POSTS,
     SORT_POSTS,
     REFRESH_POSTS,
-    VOTE_POST,
     SAVE_COMMENT,
     DELETE_COMMENT,
     VOTE_COMMENT,
@@ -78,17 +77,18 @@ export function savePost(post, history) {
     }
 }
 
-export function deletePost(post) {
-    return {
-        type: DELETE_POST,
-        post: { ...post }
+export function deletePost(post, history) {
+    return dispatch => {
+        PostsAPI.remove(post).then((post) => {
+            dispatch({ type: DELETE_POST, post: { ...post } });
+            if (history) history.push('/');
+        });
     }
 }
 
 export function getPost(postId, history) {
     return dispatch => {
         PostsAPI.get(postId).then((post) => {
-            console.log('POST',post)
             if (post.error === undefined) {
                 //dispatch({ type: GET_POST, post });
                 PostsAPI.getComments(post).then((comments) => {
@@ -97,8 +97,8 @@ export function getPost(postId, history) {
                     if (history) history.push(`/${post.category}/${postId}`);
                 });
             } else {
-                if (history) history.push('/error/page');
                 dispatch({ type: ERROR_PAGE, post });
+                if (history) history.push('/error/page');
             }
         });
     }
@@ -121,9 +121,8 @@ export function editPost(post, history) {
 export function votePost(post, option, from) {
     return dispatch => {
         PostsAPI.vote(post, option).then((post) => {
-            dispatch({ type: VOTE_POST, post });
             if (from === 'list') dispatch(listPosts());
-            else dispatch(getPost(post));
+            else dispatch(getPost(post.id));
         });
     }
 }
@@ -144,10 +143,11 @@ export function saveComment(comment) {
     }
 }
 
-export function deleteComment({ comment }) {
-    return {
-        type: DELETE_COMMENT,
-        comment
+export function deleteComment(comment) {
+    return dispatch => {
+        CommentsAPI.remove(comment).then((comment) => {
+            dispatch({ type: DELETE_COMMENT, comment: { ...comment } });
+        });
     }
 }
 

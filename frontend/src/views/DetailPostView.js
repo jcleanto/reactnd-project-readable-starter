@@ -9,26 +9,34 @@ import {
     ButtonGroup
 } from 'reactstrap';
 import { formatDate, formatHour } from '../utils/helpers'
-import { listPosts, listCategories, listPostsByCategory, getPost, votePost, getComment } from '../actions'
+import { listPostsByCategory, getPost, votePost, getComment, editPost, deletePost } from '../actions'
 import FormComment from '../components/FormComment'
 
 class DetailPostView extends Component {
 
     componentDidMount() {
-        let { post, history } = this.props;
+        let { history } = this.props;
         let postId = this.props.match.params.postId;
-        //console.log(this.props.match.params.postId)
         this.props.onGetPost(postId, history);
-        //console.log('POST',post)
-        //console.log(post)
     }
 
-    handleClickVotePost = (post, option) => {
+    handleClickVotePost = (event, post, option) => {
+        event.preventDefault();
         this.props.onClickVotePost(post, option);
     }
 
+    handleClickEditPost = (event, post, history) => {
+        event.preventDefault();
+        this.props.onClickEditPost(post, history);
+    }
+
+    handleClickDeletePost = (event, post, history) => {
+        event.preventDefault();
+        this.props.onClickDeletePost(post, history);
+    }
+
     render() {
-        const { post } = this.props
+        const { post, history } = this.props
 
         return (
             <div>
@@ -55,16 +63,16 @@ class DetailPostView extends Component {
                     </Col>
                     <Col xs="3">
                         <ButtonGroup>
-                            <Button size="sm" onClick={(event) => this.handleClickVotePost(event, post, 'upVote')}>
+                            <Button size="sm" onClick={(event) => this.handleClickEditPost(event, post, history)}>
                                 Edit
                             </Button>
-                            <Button size="sm" onClick={(event) => this.handleClickVotePost(event, post, 'upVote')}>
+                            <Button size="sm" onClick={(event) => this.handleClickDeletePost(event, post, history)}>
                                 Delete
                             </Button>
-                            <Button size="sm" onClick={() => this.handleClickVotePost(post, 'upVote')}>
+                            <Button size="sm" onClick={(event) => this.handleClickVotePost(event, post, 'upVote')}>
                                 Upvote
                             </Button>
-                            <Button size="sm" onClick={() => this.handleClickVotePost(post, 'downVote')}>
+                            <Button size="sm" onClick={(event) => this.handleClickVotePost(event, post, 'downVote')}>
                                 Downvote
                             </Button>
                         </ButtonGroup>
@@ -91,12 +99,12 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        listPosts: () => dispatch(listPosts()),
-        listCategories: () => dispatch(listCategories()),
         onClickCategory: (category, history) => dispatch(listPostsByCategory(category, history)),
         onGetPost: (post, history) => dispatch(getPost(post, history)),
         onClickVotePost: (post, option) => dispatch(votePost(post, option, 'detail')),
-        onEditComment: (comment) => dispatch(getComment(comment))
+        onEditComment: (comment) => dispatch(getComment(comment)),
+        onClickEditPost: (post, history) => dispatch(editPost(post, history)),
+        onClickDeletePost: (post, history) => dispatch(deletePost(post, history))
     }
 }
 

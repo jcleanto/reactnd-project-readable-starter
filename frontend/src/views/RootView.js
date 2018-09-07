@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Row, Col, Card, CardBody, CardHeader, Button } from 'reactstrap';
 import { ListPosts } from '../components/ListPosts'
-import { listPosts, listCategories, listPostsByCategory, getPost, detailPost, editPost, votePost, sortBy } from '../actions'
+import { listPosts, listCategories, listPostsByCategory, detailPost, editPost, votePost, sortBy, deletePost } from '../actions'
 import _ from 'lodash'
 
 class RootView extends Component {
@@ -31,8 +31,12 @@ class RootView extends Component {
 
     handleClickEditPost = (event, post, history) => {
         event.preventDefault();
-        console.log(post)
         this.props.onClickEditPost(post, history);
+    }
+
+    handleClickDeletePost = (event, post, history) => {
+        event.preventDefault();
+        this.props.onClickDeletePost(post, history);
     }
 
     handleClickVotePost = (event, post, option) => {
@@ -66,7 +70,7 @@ class RootView extends Component {
                 </Row>
                 <Row>
                     <Col xs="8">
-                        <ListPosts posts={posts} isFetching={isFetching} history={history} handleClickPost={this.handleClickPost} handleClickVotePost={this.handleClickVotePost} handleClickEditPost={this.handleClickEditPost} />
+                        <ListPosts posts={posts} isFetching={isFetching} history={history} handleClickPost={this.handleClickPost} handleClickVotePost={this.handleClickVotePost} handleClickEditPost={this.handleClickEditPost} handleClickDeletePost={this.handleClickDeletePost} />
                     </Col>
                     <Col xs="4">
                         <Card>
@@ -76,7 +80,7 @@ class RootView extends Component {
                                     {!isFetching && categories !== null &&
                                         categories.map(category => (
                                             <li key={category.name}>
-                                                <a href="#" onClick={(event) => this.handleClickCategory(event, category.name, history)}>{category.name}</a>
+                                                <a href="/" onClick={(event) => this.handleClickCategory(event, category.name, history)}>{category.name}</a>
                                             </li>
                                         ))
                                     }
@@ -95,10 +99,9 @@ class RootView extends Component {
 }
 
 function mapStateToProps(state) {
-    const activePosts = state.postsReducer.posts.filter(post => !post.deleted);
     return {
         categories: state.postsReducer.categories,
-        posts: activePosts,
+        posts: state.postsReducer.posts,
         isFetching: state.isFetching,
         comments: state.postsReducer.comments,
         sortBy: state.postsReducer.sortBy
@@ -114,7 +117,8 @@ function mapDispatchToProps(dispatch) {
         onClickPost: (post, history) => dispatch(detailPost(post, history)),
         onClickVotePost: (post, option) => dispatch(votePost(post, option, 'list')),
         onSortBy: (posts) => dispatch(sortBy(posts)),
-        onClickEditPost: (post, history) => dispatch(editPost(post, history))
+        onClickEditPost: (post, history) => dispatch(editPost(post, history)),
+        onClickDeletePost: (post, history) => dispatch(deletePost(post, history))
     }
 }
 

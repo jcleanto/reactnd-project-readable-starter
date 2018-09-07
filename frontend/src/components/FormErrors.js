@@ -1,7 +1,7 @@
 import React from 'react'
 import { Alert } from 'reactstrap'
 
-export const FormPostErrors = ({ formErrors }) =>
+export const FormErrors = ({ formErrors }) =>
     <div className='formErrors'>
         {Object.keys(formErrors).map((fieldName, i) => {
             if (formErrors[fieldName].length > 0) {

@@ -11,7 +11,7 @@ import {
     CardHeader
 } from 'reactstrap'
 import { savePost } from '../actions'
-import { FormPostErrors } from './FormPostErrors'
+import { FormErrors } from './FormErrors'
 
 class FormPost extends Component {
 
@@ -38,16 +38,26 @@ class FormPost extends Component {
         categoryValid: false
     }
 
+    componentDidMount() {
+        if (this.state.postToSave.author.length >= 3
+            && this.state.postToSave.title.length >= 3
+            && this.state.postToSave.body.length >= 3
+            && this.state.postToSave.category.length >= 3) {
+                this.setState({ 
+                    formValid: true, 
+                    authorValid: true, 
+                    titleValid: true, 
+                    bodyValid: true, 
+                    categoryValid: true 
+                });
+            }
+    }
+
     handleSubmit = (e, history) => {
         e.preventDefault();
         this.props.onSavePost({
             ...this.state.postToSave
         }, history);
-        //console.log({ 
-        //    ...this.state.commentToSave
-        //})
-        //if (this.props.onCreateContact)
-        //    this.props.onCreateContact(values)
     }
 
     onInputChange = (e, input) => {
@@ -130,7 +140,7 @@ class FormPost extends Component {
                                     type="textarea"
                                     name="body"
                                     value={postToSave && postToSave.body}
-                                    placeholder="Body"
+                                    placeholder="Text"
                                     onChange={(e) => this.onInputChange(e, { body: e.target.value })} />
                             </FormGroup>
                             <FormGroup>
@@ -150,7 +160,7 @@ class FormPost extends Component {
                                 {'  '}
                                 <Button color="primary" onClick={history.goBack}>Cancel</Button>
                             </FormGroup>
-                            <FormPostErrors formErrors={this.state.formErrors} />
+                            <FormErrors formErrors={this.state.formErrors} />
                         </Form>
                     </CardBody>
                 </Card>

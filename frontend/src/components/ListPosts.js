@@ -2,14 +2,14 @@ import React from 'react'
 import { Row, Col, Badge, Button, ButtonGroup } from 'reactstrap';
 import { formatDate, formatHour } from '../utils/helpers'
 
-export const ListPosts = ({ posts, isFetching, history, handleClickPost, handleClickVotePost, handleClickEditPost }) => {
+export const ListPosts = ({ posts, isFetching, history, handleClickPost, handleClickVotePost, handleClickEditPost, handleClickDeletePost }) => {
     return (
         <ul>
             {!isFetching && posts !== null &&
                 posts.map(post => (
                     <li key={post.id} className="list-post">
                         <h1 className="mt-4">
-                            <a href="#" onClick={(event) => handleClickPost(event, post, history)}>{post.title}</a>
+                            <a href="/" onClick={(event) => handleClickPost(event, post, history)}>{post.title}</a>
                         </h1>
                         <p className="lead">by {post.author}</p>
                         <hr />
@@ -34,7 +34,7 @@ export const ListPosts = ({ posts, isFetching, history, handleClickPost, handleC
                                     <Button size="sm" onClick={(event) => handleClickEditPost(event, post, history)}>
                                         Edit
                                     </Button>
-                                    <Button size="sm" onClick={(event) => handleClickVotePost(event, post, 'upVote')}>
+                                    <Button size="sm" onClick={(event) => handleClickDeletePost(event, post, history)}>
                                         Delete
                                     </Button>
                                     <Button size="sm" onClick={(event) => handleClickVotePost(event, post, 'upVote')}>
