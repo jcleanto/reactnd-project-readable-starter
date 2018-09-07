@@ -19,7 +19,6 @@ import {
 } from '../constants/ActionTypes'
 import * as PostsAPI from '../utils/PostsAPI'
 import * as CommentsAPI from '../utils/CommentsAPI'
-import _ from 'lodash'
 
 export function listCategories() {
     return dispatch => {
@@ -36,12 +35,10 @@ function requestPosts() {
 }
 
 export function listPosts(sortBy) {
-    let sortedPosts = [];
     return dispatch => {
         dispatch(requestPosts());
         PostsAPI.getAll().then((posts) => {
-            sortedPosts = _.sortBy(posts, sortBy).reverse();
-            dispatch({ type: REFRESH_POSTS, posts: sortedPosts });
+            dispatch({ type: REFRESH_POSTS, posts: posts });
         });
     }
 }
@@ -90,7 +87,6 @@ export function getPost(postId, history) {
     return dispatch => {
         PostsAPI.get(postId).then((post) => {
             if (post.error === undefined) {
-                //dispatch({ type: GET_POST, post });
                 PostsAPI.getComments(post).then((comments) => {
                     dispatch({ type: GET_POST, post });
                     dispatch({ type: LIST_COMMENTS, comments });

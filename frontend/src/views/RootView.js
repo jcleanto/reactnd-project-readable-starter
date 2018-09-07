@@ -14,8 +14,7 @@ class RootView extends Component {
     }
 
     handleChangeSortBy = (field) => {
-        const orderedPosts = _.sortBy(this.props.posts, field);
-        if (field === 'voteScore') orderedPosts.reverse();
+        const orderedPosts = _.orderBy(this.props.posts, field, 'desc');
         this.props.onSortBy(orderedPosts);
     }
 

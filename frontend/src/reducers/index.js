@@ -45,10 +45,11 @@ function postsReducer(state = initialState, action) {
                 isFetching: true
             };
         case REFRESH_POSTS:
+            let sortedPosts = _.orderBy(posts, sortBy, 'desc');
             return {
                 ...state,
                 isFetching: false,
-                posts: posts,
+                posts: sortedPosts,
                 sortBy: sortBy
             };
         case SORT_POSTS:
@@ -109,14 +110,14 @@ function commentsReducer(state = {}, action) {
             };
         case LIST_COMMENTS:
             //more voted first
-            const orderedComments = _.sortBy(comments, 'voteScore').reverse();
+            const orderedComments = _.orderBy(comments, 'voteScore', 'desc');
             return {
                 ...state,
                 comments: orderedComments
             };
         case REFRESH_COMMENTS:
             let refreshedComments = state.comments.filter(c => c.id !== comment.id);
-            refreshedComments = _.sortBy(refreshedComments, 'voteScore').reverse();
+            refreshedComments = _.orderBy(refreshedComments, 'voteScore', 'desc');
             return {
                 ...state,
                 comments: [...refreshedComments, comment]
