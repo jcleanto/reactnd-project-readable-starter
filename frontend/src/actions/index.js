@@ -86,7 +86,8 @@ export function deletePost(post, history) {
 export function getPost(postId, history) {
     return dispatch => {
         PostsAPI.get(postId).then((post) => {
-            if (post.error === undefined) {
+            console.log(post.id)
+            if (post.id !== undefined && post.error === undefined) {
                 PostsAPI.getComments(post).then((comments) => {
                     dispatch({ type: GET_POST, post });
                     dispatch({ type: LIST_COMMENTS, comments });
@@ -134,6 +135,7 @@ export function saveComment(comment) {
             CommentsAPI.insert(comment).then((comment) => {
                 dispatch({ type: SAVE_COMMENT, comment });
                 dispatch({ type: REFRESH_COMMENTS, comment });
+                dispatch(getPost(comment.parentId, null));
             });
         }
     }
@@ -143,6 +145,7 @@ export function deleteComment(comment) {
     return dispatch => {
         CommentsAPI.remove(comment).then((comment) => {
             dispatch({ type: DELETE_COMMENT, comment: { ...comment } });
+            dispatch(getPost(comment.parentId, null));
         });
     }
 }

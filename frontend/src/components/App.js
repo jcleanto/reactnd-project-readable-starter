@@ -51,9 +51,9 @@ class App extends Component {
             <Switch>
               <Route exact path="/" component={RootView} />
               <Route exact path="/error/page" render={() => <ErrorView />} />
-              <Route exact path="/:category" component={RootView} />
-              <Route exact path="/:category/:postId" component={DetailPostView} />
-              <Route exact path="/posts/edit/:postId" component={EditPostView} />
+              <Route path="/posts/edit/:postId" component={EditPostView} />
+              <Route path="/:category/:postId" component={DetailPostView} />
+              <Route path="/:category" component={RootView} />
             </Switch>
           </Container>
         </Jumbotron>
